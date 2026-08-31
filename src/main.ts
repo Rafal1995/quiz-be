@@ -15,6 +15,11 @@ async function bootstrap() {
 
   app.enableCors();
 
+  // Graceful shutdown: on SIGTERM (e.g. `docker stop`), Nest runs lifecycle
+  // hooks to close the HTTP server, WebSocket gateway and DB connections
+  // cleanly before the process exits.
+  app.enableShutdownHooks();
+
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
   console.log(`Application running on port ${port}`);

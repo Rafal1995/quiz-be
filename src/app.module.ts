@@ -8,6 +8,7 @@ import { Round } from './round/round.entity.js';
 import { Answer } from './round/answer.entity.js';
 import { SessionModule } from './session/session.module.js';
 import { GameModule } from './game/game.module.js';
+import { HealthModule } from './health/health.module.js';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { GameModule } from './game/game.module.js';
     }),
     SessionModule,
     GameModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
