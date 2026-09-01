@@ -26,8 +26,11 @@ import { HealthModule } from './health/health.module.js';
         password: config.get<string>('database.password'),
         database: config.get<string>('database.database'),
         entities: [Session, Player, Round, Answer],
+        // Migrations are NOT run on app bootstrap. They run as an explicit
+        // step in the container entrypoint (docker-entrypoint.sh) before the
+        // app starts, so a failed migration stops startup with a clear error.
         migrations: ['dist/migrations/*.js'],
-        migrationsRun: true,
+        migrationsRun: false,
         synchronize: false,
       }),
     }),

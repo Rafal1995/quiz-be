@@ -66,8 +66,26 @@ A Postgres instance for local development is provided via Docker Compose:
 $ docker compose -f docker-compose.dev.yml up -d
 ```
 
-The app runs pending TypeORM migrations automatically on startup
-(`migrationsRun: true`), so the schema is created on first connect.
+## Migrations
+
+Migrations run against the **compiled** output in `dist/` (the project is
+NodeNext/ESM, so running the TypeORM CLI on compiled JS is the reliable path).
+
+Local development (each script builds first, then runs the CLI on `dist/`):
+
+```bash
+$ npm run migration:run       # apply pending migrations
+$ npm run migration:revert    # revert the last migration
+$ npm run migration:generate -- src/migrations/<Name>   # generate from entity diff
+$ npm run migration:create -- src/migrations/<Name>     # create an empty migration
+```
+
+In the container, migrations run automatically **before** the app starts, via
+the entrypoint (`docker-entrypoint.sh` → `npm run migration:run:prod`). If a
+migration fails, the entrypoint exits non-zero and the container stops instead
+of starting the app against an out-of-date schema. Migrations are idempotent,
+so restarts are safe. The app itself does **not** run migrations on bootstrap
+(`migrationsRun: false`, `synchronize: false`).
 
 ## Health check
 
