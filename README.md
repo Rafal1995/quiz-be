@@ -57,6 +57,57 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Local database
+
+A Postgres instance for local development is provided via Docker Compose:
+
+```bash
+# start only the database (apps run locally in dev mode)
+$ docker compose -f docker-compose.dev.yml up -d
+```
+
+The app runs pending TypeORM migrations automatically on startup
+(`migrationsRun: true`), so the schema is created on first connect.
+
+## Health check
+
+The app exposes a lightweight liveness endpoint at `GET /health`, returning
+`200 {"status":"ok"}` with no dependency checks. It backs the Docker
+`HEALTHCHECK` and compose `depends_on: service_healthy`.
+
+## Docker (local image)
+
+The production image is hardened per best practices: multi-stage build on
+`node:24-alpine`, runs as the non-root `node` user, `NODE_ENV=production`,
+`dumb-init` as PID 1 for signal forwarding + graceful shutdown, and a
+`HEALTHCHECK` against `/health`.
+
+Build the image:
+
+```bash
+$ docker build -t quiz-be:local .
+```
+
+Run it against a reachable Postgres (example points at a host DB via
+`host.docker.internal`):
+
+```bash
+$ docker run --rm -p 3000:3000 \
+    -e DB_HOST=host.docker.internal \
+    -e DB_PORT=5432 \
+    -e DB_USERNAME=quiz \
+    -e DB_PASSWORD=quiz_secret \
+    -e DB_NAME=quiz_db \
+    quiz-be:local
+```
+
+Verify:
+
+```bash
+$ curl http://localhost:3000/health   # -> {"status":"ok"}
+$ docker ps                            # STATUS shows "healthy"
+```
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.

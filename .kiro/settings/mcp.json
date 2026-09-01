@@ -2,15 +2,31 @@
   "mcpServers": {
     "context7": {
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
       "disabled": false,
       "autoApprove": []
     },
     "nestjs-docs": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://gitmcp.io/nestjs/nest"],
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://gitmcp.io/nestjs/nest"
+      ],
       "disabled": false,
       "autoApprove": []
+    },
+    "notion": {
+      "url": "https://mcp.notion.com/mcp",
+      "autoApprove": [
+        "notion-fetch",
+        "notion-fetch",
+        "notion-query-data-sources",
+        "notion-query-data-sources"
+      ]
     }
   }
 }
