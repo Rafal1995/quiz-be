@@ -29,6 +29,10 @@ RUN npm ci --omit=dev
 # Compiled output from the builder stage.
 COPY --from=builder /app/dist ./dist
 
+# Entrypoint runs migrations before starting the app.
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Run as the built-in non-root `node` user shipped with the base image.
 USER node
 
@@ -38,5 +42,6 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD node -e "require('http').get('http://127.0.0.1:3000/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
 
-ENTRYPOINT ["dumb-init", "--"]
+# dumb-init (PID 1) -> entrypoint (runs migrations) -> exec node (CMD).
+ENTRYPOINT ["dumb-init", "--", "/usr/local/bin/docker-entrypoint.sh"]
 CMD ["node", "dist/main"]
